@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Orders</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf3 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        header {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .order-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+        .status-pending { color: #dc3545; }
+        .status-delivered { color: #198754; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">Seller Dashboard</a>
+                <div class="navbar-nav">
+                    <a class="nav-link" href="dashboard.html">Home</a>
+                    <a class="nav-link" href="add-product.html">Add Product</a>
+                    <a class="nav-link active" href="orders.html">Orders</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <select id="statusFilter" class="form-select">
+                            <option value="">All Orders</option>
+                            <option value="pending">Pending</option>
+                            <option value="delivered">Delivered</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button onclick="searchByStatus()" class="btn btn-primary me-2">Search</button>
+                        <button onclick="loadOrders()" class="btn btn-secondary">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loadingSpinner" class="text-center" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <div id="orders-container"></div>
+    </div>
+
+    <script>
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadOrders);
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function showLoading() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+
+        
+        function renderOrderCard(order) {
+    if (!order || !order.orderId) return '';
+    
+    // Format the date nicely
+    const orderDate = order.orderDateTime ? 
+        new Date(order.orderDateTime).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }) : 'N/A';
+    
+    // Determine status class for styling
+    const status = (order.status || '').toLowerCase();
+    const statusClass = status === 'pending' ? 'status-pending' : 'status-delivered';
+    
+    // Format prices to 2 decimal places
+    const formattedPrice = Number(order.price).toFixed(2);
+    const formattedTotalPrice = Number(order.totalPrice).toFixed(2);
+    
+    return `
+        <div class="order-card">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <strong>Order ID:</strong> ${order.orderId}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Date:</strong> ${orderDate}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <strong>Status:</strong> 
+                        <span class="${statusClass} text-capitalize">${status || 'unknown'}</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Quantity:</strong> ${order.quantity}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-2">
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <strong>Unit Price:</strong> $${formattedPrice}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <strong>Total Price:</strong> $${formattedTotalPrice}
+                    </div>
+                </div>
+            </div>
+            
+            ${status === 'pending' ? `
+                <div class="text-end mt-3">
+                    <button onclick="updateOrderStatus('${order.orderId}')" 
+                            class="btn btn-primary btn-sm">
+                        Mark as Delivered
+                    </button>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+async function searchByStatus() {
+    const status = document.getElementById('statusFilter').value;
+    if (!status) {
+        loadOrders();
+        return;
+    }
+
+    hideError();
+    showLoading();
+
+    try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            throw new Error("Please log in to view orders");
+        }
+
+        const response = await fetch(`http://localhost:8080/api/v1/seller/get-orders-by-status?status=${encodeURIComponent(status)}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/json"
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || `Failed to search orders: ${response.statusText}`);
+        }
+
+        const container = document.getElementById('orders-container');
+        
+        // Handle the case where we get a single order or an array of orders
+        const orders = Array.isArray(data) ? data : [data];
+        
+        if (orders.length === 0 || !orders[0]) {
+            container.innerHTML = '<div class="alert alert-info">No orders found for this status</div>';
+            return;
+        }
+
+        const orderCards = orders
+            .filter(order => order && order.orderId)
+            .map(renderOrderCard)
+            .join('');
+
+        if (!orderCards) {
+            container.innerHTML = '<div class="alert alert-info">No valid orders found</div>';
+            return;
+        }
+
+        container.innerHTML = orderCards;
+
+    } catch (error) {
+        console.error("Error:", error);
+        showError(error.message || "Failed to search orders");
+    } finally {
+        hideLoading();
+    }
+}
+
+async function loadOrders() {
+    hideError();
+    showLoading();
+    
+    try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            throw new Error("Please log in to view orders");
+        }
+
+        const response = await fetch("http://localhost:8080/api/v1/seller/get-orders", {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/json"
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || `Failed to fetch orders: ${response.statusText}`);
+        }
+
+        const container = document.getElementById('orders-container');
+        
+        if (!Array.isArray(data) || data.length === 0) {
+            container.innerHTML = '<div class="alert alert-info">No orders available</div>';
+            return;
+        }
+
+        const orderCards = data
+            .filter(order => order && order.orderId)
+            .map(renderOrderCard)
+            .join('');
+
+        if (!orderCards) {
+            container.innerHTML = '<div class="alert alert-info">No valid orders found</div>';
+            return;
+        }
+
+        container.innerHTML = orderCards;
+
+    } catch (error) {
+        console.error("Error:", error);
+        showError(error.message || "Failed to load orders");
+    } finally {
+        hideLoading();
+    }
+}
+
+
+async function updateOrderStatus(orderId) {
+            if (!orderId) return;
+
+            try {
+                const token = localStorage.getItem("token");
+                if (!token) {
+                    throw new Error("Please log in to update orders");
+                }
+
+                const response = await fetch("http://localhost:8080/api/v1/seller/put-order", {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(orderId)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to update order: ${response.statusText}`);
+                }
+
+                await loadOrders();
+
+            } catch (error) {
+                console.error("Error:", error);
+                showError(error.message || "Failed to update order status");
+            }
+        }
+    </script>
+</body>
+</html>

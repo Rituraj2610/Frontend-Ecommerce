@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Page Background */
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f5f5f5;
+    }
+
+    /* Form Container */
+    #loginForm {
+        background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+    }
+
+    /* Form Header */
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Input Labels */
+    label {
+        display: block;
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 5px;
+    }
+
+    /* Input Fields */
+    input[type="email"],
+    input[type="password"],
+    select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    /* Button Styling */
+    button {
+        margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            background-color: #f39c12;
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #db8e13;
+    }
+
+    /* Form Spacing */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    </style>
+    
+</head>
+<body>
+
+   
+    <form id="loginForm">
+        <h2>Admin Login</h2>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <label for="role">Role:</label>
+        <select id="role" name="role" required>
+            <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+            <option value="USER_ADMIN">USER_ADMIN</option>
+            <option value="PRODUCT_ADMIN">PRODUCT_ADMIN</option>
+        </select><br><br>
+
+        <button type="button" onclick="login()">Login</button>
+    </form>
+
+    <script>
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            try {
+                const response = await fetch("http://localhost:8080/admin/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email, password, role })
+                });
+
+             
+        if (response.ok) {
+            const token = await response.text(); 
+            localStorage.setItem('TOKEN', token); 
+            localStorage.setItem('currentRole',role);
+            // const JWT_TOKEN = await response.headers.get("Set-Cookie");
+            // document.cookie = JWT_TOKEN;
+          
+  
+                    window.location.href = "AdminUser.html";
+
+                } else {
+                    alert("Login failed. Please check your credentials.");
+                }
+            } catch (error) {
+                console.error("Error during login:", error);
+                alert("An error occurred during login.");
+            }
+        }
+    </script>
+
+</body>
+</html>

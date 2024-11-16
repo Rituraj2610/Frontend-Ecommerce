@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+<style>
+        /* Modern CSS Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: #f5f7fa;
+            color: #2d3748;
+        }
+
+        /* Improved Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sidebar h2 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar button {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            text-align: left;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .sidebar button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Button Styles */
+        .btn-delete, .del-btn-user, .del-btn-product, .del-btn-productadmin, .del-btn-useradmin {
+            background-color: #e53e3e;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-view, .view-btn-user, .view-btn {
+            background-color: #3182ce;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .review-btn-user {
+            background-color: #805ad5;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Section Headers */
+        .section-header {
+            color: #2d3748;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-delete {
+            background-color: #fc8181;
+            color: white;
+        }
+
+        .btn-view {
+            background-color: #4299e1;
+            color: white;
+            margin-right: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form Styles */
+        form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            max-width: 500px;
+            margin: 2rem auto;
+        }
+
+        form input,
+        form select {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        form label {
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        form button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        form button:hover {
+            background-color: #1a252f;
+        }
+
+        /* Reviews Table Specific Styles */
+        .review-table {
+            margin-top: 2rem;
+        }
+
+        .review-table th {
+            background-color: #f8fafc;
+        }
+
+        .review-rating {
+            font-weight: 600;
+            color: #2c5282;
+        }
+
+        .review-comment {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2 style="color:white">Admin Dashboard</h2>
+        <button onclick="createAdmin()" id="registernav">Register Admin</button>
+        <button onclick="fetchSeller()" id="sellernav">Seller</button>
+        <button onclick="fetchUser()" id="usernav">User</button>
+        <button onclick="fetchProductAdmin()" id="productadminnav">Product Admin</button>
+        <button onclick="fetchUserAdmin()" id="useradminnav">User Admin</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- <h2>Dashboard Data</h2> -->
+
+        <form id="registerForm">
+            <h3>Register Admin</h3>
+            <label for="name">Name:</label><br>
+            <input type="name" id="name" name="name" required><br><br>
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email" required><br><br>
+
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" required><br><br>
+
+            <label for="role">Role:</label><br>
+            <select id="role" name="role" required>
+                <option value="USER_ADMIN">USER_ADMIN</option>
+                <option value="PRODUCT_ADMIN">PRODUCT_ADMIN</option>
+            </select><br><br>
+
+            <button type="button" onclick="register()">Register</button>
+        </form>
+        <div class="container" style="display:none">
+
+            <table id="sellerTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="sellertable">
+
+                </tbody>
+            </table>
+
+        </div>
+        <div class="div-user-container">
+            <table id="userTable" style="display:none">
+
+                <thead>
+
+                </thead>
+                <tbody id="userTableBody">
+                </tbody>
+            </table>
+        </div>
+        <table id="adminTable" style="display:none">
+
+            <thead>
+
+            </thead>
+            <tbody id="admintable">
+
+            </tbody>
+
+        </table>
+    </div>
+
+    <script>
+        const rolenow = localStorage.getItem("currentRole");
+        let currentRole = "";
+        if (rolenow == 'SUPER_ADMIN') {
+            currentRole = "superadmin";
+
+        }
+        else if (rolenow == 'PRODUCT_ADMIN') {
+            currentRole = "productadmin";
+            document.getElementById('registernav').style.display = "none";
+            document.getElementById('usernav').style.display = "none";
+            document.getElementById('productadminnav').style.display = "none";
+            document.getElementById('useradminnav').style.display = "none";
+        }
+        else {
+            currentRole = "useradmin";
+            document.getElementById('registernav').style.display = "none";
+            document.getElementById('sellernav').style.display = "none";
+            document.getElementById('productadminnav').style.display = "none";
+            document.getElementById('useradminnav').style.display = "none";
+        }
+       
+        // Function to handle user registration
+        async function register() {
+            // Get form data
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            document.getElementById('adminTable').style.display = "none";
+            document.getElementById('userTable').style.display = "none";
+            document.querySelector('.container').style.display = "none";
+
+            // Prepare the request payload
+            const requestData = {
+                name: name,
+                email: email,
+                password: password,
+                roles: role
+            };
+
+            // Get JWT token from localStorage
+            const token = localStorage.getItem('TOKEN');
+
+            try {
+                const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/admins`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,  // Add the JWT token in the Authorization header
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(requestData)  // Send the form data as JSON
+                });
+
+                // Check if the response is successful
+                if (response.ok) {
+                    const data = await response.text();
+                    console.log("Admin registered successfully:", data);
+                    alert("Admin registered successfully!");
+                } else {
+                    console.error("Failed to register admin:", response.status, response.statusText);
+                    alert("Failed to register admin.");
+                }
+            } catch (error) {
+                console.error("Error during registration:", error);
+                alert("Error during registration.");
+            }
+        }
+        
+
+        // Function to show the form when Register Admin button is clicked
+        function createAdmin() {
+            const form = document.getElementById('registerForm');
+            form.style.display = "block";
+            document.getElementById('adminTable').style.display = "none";
+            document.getElementById('userTable').style.display = "none";
+            document.querySelector('.container').style.display = "none";
+        }
+
+        // Fetch data from Super Admin Dashboard
+        async function fetchDashboardData() {
+            const token = localStorage.getItem('TOKEN');
+
+            try {
+                const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include"
+                });
+
+                if (response.ok) {
+                    const data = await response.text();
+                    console.log("Dashboard Data:", data);
+                } else {
+                    console.error("Failed to fetch data:", response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+
+
+        // Fetch Seller Dashboard Data
+        async function fetchSeller() {
+            const form = document.getElementById('registerForm');
+            form.style.display = "none";
+
+            document.getElementById('adminTable').style.display = "none";
+            const token = localStorage.getItem('TOKEN');
+
+            try {
+                const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/sellers`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include"
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    sellers = data;
+                    console.log("Seller Dashboard Data:", sellers);
+                    displaySellers();
+                } else {
+                    console.error("Failed to fetch seller data:", response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error("Error fetching seller data:", error);
+            }
+        }
+
+        function displaySellers() {
+            document.querySelector(".container").style.display = "block";
+            document.querySelector("#userTable").style.display = "none";
+            document.getElementById('adminTable').style.display = "none";
+            document.getElementById('registerForm').style.display = "none";
+            const tableBody = document.getElementById('sellertable');
+            tableBody.innerHTML = ""; // Clear existing table rows before adding new ones
+
+            sellers.forEach(seller => {
+                const row = document.createElement('tr');
+
+                const idCell = document.createElement('td');
+                idCell.textContent = seller.id;
+                row.appendChild(idCell);
+
+                const nameCell = document.createElement('td');
+                nameCell.textContent = seller.name;
+                row.appendChild(nameCell);
+
+                const emailCell = document.createElement('td');
+                emailCell.textContent = seller.email;
+                row.appendChild(emailCell);
+
+                const actionCell = document.createElement('td');
+                const viewButton = document.createElement('button');
+                viewButton.textContent = "View All Products";
+                viewButton.classList.add("view-btn");
+                viewButton.onclick = () => viewProducts(seller.id);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Delete";
+                deleteButton.classList.add("delete-btn");
+                deleteButton.onclick = () => deleteSeller(seller.id);
+
+                actionCell.appendChild(viewButton);
+                actionCell.appendChild(deleteButton);
+                row.appendChild(actionCell);
+
+                tableBody.appendChild(row);
+            });
+        }
+        function deleteSeller(id) {
+            // Get JWT token from local storage
+            const token = localStorage.getItem("TOKEN");
+
+            // Set up the URL and request options
+            const url = `http://localhost:8080/admin/${currentRole}/dashboard/delete-seller?userId=${id}`;
+
+
+            const options = {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+                // Include form-data with the userId
+            };
+
+            fetch(url, options)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to delete seller: " + response.statusText);
+                    }
+                    
+                })
+                .then(data => {
+                    console.log("Seller deleted successfully:", data);
+                    // Additional actions after successful deletion, if needed
+                })
+                .catch(error => {
+                    console.error("Error deleting seller:", error);
+                });
+        }
+
+        function viewProducts(sellerId) {
+            document.querySelector(".container").style.display = "none";
+            document.querySelector("#userTable").style.display = "none";
+            document.getElementById('adminTable').style.display = "none";
+
+
+            // Get the JWT token from localStorage
+            const token = localStorage.getItem('TOKEN');
+
+            if (!token) {
+                console.error("No token found in local storage.");
+                return;
+            }
+
+            // Make the GET request to fetch seller products
+            fetch(`http://localhost:8080/admin/${currentRole}/dashboard/seller-products?sellerId=${sellerId}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                credentials: "include"
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Products for seller ID", sellerId, data);
+
+                    // Display the products in the container
+                    displayProducts(data);
+                })
+                .catch(error => {
+                    console.error("Error fetching products:", error);
+                });
+        }
+
+        function displayProducts(products) {
+            const container = document.querySelector(".container");
+            document.getElementById('admintable').style.display = "none";
+            document.getElementById('adminTable').style.display = "none";
+            document.getElementById('adminTable').style.display = "none";
+            container.style.display = "block";
+            const back = document.createElement('button');
+            back.textContent = "Back";
+            back.className = "back";
+            back.onclick = () => {
+                fetchSeller();
+            }
+
+            // Check if there are products
+            if (products && products.length > 0) {
+
+                let table = `<h3>Products for Seller</h3>
+                    <table border="1" style="width:100%; margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Description</th>
+                             
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+                // Loop through products and add them to the table
+                products.forEach(product => {
+                    table += `<tr>
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.price}</td>
+                        <td>${product.description}</td>
+                        <td><button class="del-btn-product" data-product-id="${product.id}">delete</button></td>
+                    </tr>`;
+                });
+
+                table += "</tbody></table>";
+
+                // Add the table to the container
+                container.innerHTML = table;
+                container.appendChild(back);
+            } else {
+                container.innerHTML = "<p>No products found for this seller.</p>";
+            }
+            document.querySelectorAll('.del-btn-product').forEach(button => {
+                button.addEventListener('click', async function () {
+                    const productId = this.getAttribute('data-product-id');
+                    const token = localStorage.getItem('TOKEN'); // Get the JWT token
+
+                    if (!token) {
+                        console.error("No token found in local storage.");
+                        return;
+                    }
+
+                    try {
+                        // Send the DELETE request to the specified endpoint
+                        const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/delete-product?productId=${productId}`, {
+                            method: "DELETE",
+                            headers: {
+                                "Authorization": `Bearer ${token}`, // Add JWT token
+                                "Content-Type": "application/json"
+                            },
+
+                        });
+
+                        if (response.ok) {
+                            console.log("User deleted successfully.");
+                            alert("User deleted successfully!");
+                            return response.text();
+
+                        } else {
+                            console.error("Failed to delete user:", response.status, response.statusText);
+                            alert("Failed to delete user.");
+                        }
+                    } catch (error) {
+                        console.error("Error deleting user:", error);
+                    }
+                });
+            });
+
+        }
+
+        // async function deleteProduct(productId) {
+        //     console.log("delete");
+        //     const token = localStorage.getItem('TOKEN'); // Get the JWT token
+
+        //     if (!token) {
+        //         console.error("No token found in local storage.");
+        //         return;
+        //     }
+
+        //     // Make the DELETE request to remove the product
+        //     try {
+        //         const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/delete-product?productId=${productId}`, {
+        //             method: "DELETE",
+        //             headers: {
+        //                 "Authorization": `Bearer ${token}`,
+        //                 "Content-Type": "application/json"
+        //             },
+        //             credentials: "include"
+        //         });
+
+        //         if (response.ok) {
+        //             console.log("Product deleted successfully.");
+        //             // Refresh the product list after deletion
+        //             fetchSeller(); // You can modify this to fetch and update the product list dynamically if needed
+        //         } else {
+        //             console.error("Failed to delete product:", response.status, response.statusText);
+        //         }
+        //     } catch (error) {
+        //         console.error("Error deleting product:", error);
+        //     }
+        // }
+
+        // Fetch User Dashboard Data
+        async function fetchUser() {
+
+            const token = localStorage.getItem('TOKEN');
+
+            try {
+                const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/users`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayUserTable(data); // Call function to display data in the table
+                } else {
+                    console.error("Failed to fetch user data:", response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        }
+        function displayUserTable(users) {
+            console.log(users);
+            // const userTable = document.getElementById('userTable');
+            // document.querySelector(".container").style.display = "none";
+            // document.querySelector("#userTable").style.display = "block";
+            // document.getElementById('adminTable').style.display = "none";
+            // document.getElementById('registerForm').style.display = "none";
+            // document.querySelector(".div-user-container").style.display = "block";
+
+            // const userTableBody = document.getElementById('userTableBody');
+            // userTableBody.innerHTML = ""; // Clear any previous rows
+            // userTable.style.display = "block";
+
+            // users.forEach(user => {
+            //     const row = document.createElement('tr');
+
+            //     // User details
+            //     row.innerHTML = `
+            //         <td>${user.id}</td>
+            //         <td>${user.name}</td>
+            //         <td>${user.email}</td>
+            //         <td>${user.roles}</td>
+            //         <td>
+            //             <button class="del-btn-user" data-product-id="${user.id}">delete</button>
+            //             <button class="view-btn-user" data-product-id="${user.id}">view cart</button>
+            //                <button class="review-btn-user" data-product-id="${user.id}">reviews</button>
+            //         </td>
+            //     `;
+
+            //     userTableBody.appendChild(row);
+            //     userTableBody.style.display = "block";
+            // });
+
+            const userTable = document.getElementById('userTable');
+            document.querySelector(".container").style.display = "none";
+            userTable.style.display = "block";
+            document.getElementById('adminTable').style.display = "none";
+            document.getElementById('registerForm').style.display = "none";
+            document.querySelector(".div-user-container").style.display = "block";
+
+            userTable.innerHTML = `
+                <h2 class="section-header">User Management</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody"></tbody>
+                </table>
+            `;
+
+            const userTableBody = document.getElementById('userTableBody');
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.roles}</td>
+                    <td>
+                        <button class="del-btn-user" data-product-id="${user.id}">Delete</button>
+                        <button class="view-btn-user" data-product-id="${user.id}">View Cart</button>
+                        <button class="review-btn-user" data-product-id="${user.id}">Reviews</button>
+                    </td>
+                `;
+                userTableBody.appendChild(row);
+                       //     userTableBody.style.display = "block";
+            });
+
+            // Bind event listeners to delete buttons after they are added to the DOM
+            document.querySelectorAll('.del-btn-user').forEach(button => {
+                button.addEventListener('click', async function () {
+                    const userId = this.getAttribute('data-product-id');
+                    const token = localStorage.getItem('TOKEN'); // Get the JWT token
+
+                    if (!token) {
+                        console.error("No token found in local storage.");
+                        return;
+                    }
+
+                    try {
+                        // Send the DELETE request to the specified endpoint
+                        const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/user?userId=${userId}`, {
+                            method: "DELETE",
+                            headers: {
+                                "Authorization": `Bearer ${token}`, // Add JWT token
+                                "Content-Type": "application/json"
+                            },
+
+                        });
+
+                        if (response.ok) {
+                            console.log("User deleted successfully.");
+                            alert("User deleted successfully!");
+
+                            // Optionally, refresh the user list to reflect the deletion
+                            fetchUser();
+                        } else {
+                            console.error("Failed to delete user:", response.status, response.statusText);
+                            alert("Failed to delete user.");
+                        }
+                    } catch (error) {
+                        console.error("Error deleting user:", error);
+                    }
+                });
+            });
+            document.querySelectorAll('.view-btn-user').forEach(button => {
+                button.addEventListener('click', async function () {
+                    const userId = this.getAttribute('data-product-id');
+                    const token = localStorage.getItem('TOKEN'); // Get JWT token from local storage
+
+                    // Check if the token is available
+                    if (!token) {
+                        console.error("No token found in local storage.");
+                        alert("Authentication token missing. Please log in again.");
+                        return;
+                    }
+
+                    try {
+                        // Send the request with GET method and buyerId as query parameter
+                        const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/user-cart?buyerId=${encodeURIComponent(userId)}`, {
+                            method: "GET",  // Using GET method
+                            headers: {
+                                "Authorization": `Bearer ${token}`,  // Include JWT token in Authorization header
+                                "Content-Type": "application/json"
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            displayCart(data); // Log the cart data
+                        } else {
+                            console.error("Failed to fetch user cart:", response.status, response.statusText);
+                        }
+                    } catch (error) {
+                        console.error("Error fetching user cart:", error);
+                    }
+
+                });
+            });
+
+        document.querySelectorAll('.review-btn-user').forEach(button => {
+                button.addEventListener('click', async function () {
+                    const userId = this.getAttribute('data-product-id');
+                    const token = localStorage.getItem('TOKEN'); // Get JWT token from local storage
+
+                    // Check if the token is available
+                    if (!token) {
+                        console.error("No token found in local storage.");
+                        alert("Authentication token missing. Please log in again.");
+                        return;
+                    }
+
+                    try {
+                        // Send the request with GET method and buyerId as query parameter
+                        const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/user-reviews?userId=${userId}`, {
+                            method: "GET",  // Using GET method
+                            headers: {
+                                "Authorization": `Bearer ${token}`,  // Include JWT token in Authorization header
+                                "Content-Type": "application/json"
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            displayReviews(data); // Log the cart data
+                        } else {
+                            console.error("Failed to fetch user cart:", response.status, response.statusText);
+                        }
+                    } catch (error) {
+                        console.error("Error fetching user cart:", error);
+                    }
+
+                });
+            });
+        }
+        function displayCart(users) {
+            const userTable = document.getElementById('userTable');
+            document.querySelector(".container").style.display = "none";
+            document.querySelector("#userTable").style.display = "block";
+            document.getElementById('adminTable').style.display = "none";
+            document.getElementById('registerForm').style.display = "none";
+
+            const userTableBody = document.getElementById('userTableBody');
+            userTableBody.innerHTML = ""; // Clear any previous rows
+            userTable.style.display = "block";
+
+            users.cartItem.forEach(user => {
+                const row = document.createElement('tr');
+
+                // User details
+                row.innerHTML = `
+                    <td>${user.productId}</td>
+                    <td>${user.name}</td>
+                    <td>${user.quantity}</td>
+                    <td>${user.price}</td>
+                   
+                `;
+
+                userTableBody.appendChild(row);
+                userTableBody.style.display = "block";
+            });
+
+
+        }
+        function displayReviews(data) {
+    const userTable = document.getElementById('userTable');
+    document.querySelector(".container").style.display = "none";
+    document.querySelector("#userTable").style.display = "block";
+    document.getElementById('adminTable').style.display = "none";
+    document.getElementById('registerForm').style.display = "none";
+
+    const userTableBody = document.getElementById('userTableBody');
+    userTableBody.innerHTML = `
+        <tr>
+            <th>Review ID</th>
+            <th>User ID</th>
+            <th>Product ID</th>
+            <th>Rating</th>
+            <th>Comment</th>
+        </tr>
+    `; // Set table headers, now including Product ID
+    userTable.style.display = "block";
+
+    data.forEach(review => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${review.id}</td>
+            <td>${review.userId}</td>
+            <td>${review.productId}</td>
+            <td class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</td>
+            <td class="review-comment">${review.comment}</td>
+        `;
+        userTableBody.appendChild(row);
+    });
+}
+
+        
+
+
+        async function fetchProductAdmin() {
+            document.querySelector(".container").style.display = "none";
+            document.querySelector("#userTable").style.display = "none";
+            document.getElementById('adminTable').style.display = "block";
+            document.getElementById('registerForm').style.display = "none";
+            document.querySelector(".div-user-container").style.display = "none";
+            const token = localStorage.getItem('TOKEN');
+            try {
+                const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/productadmins`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include"
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+
+                    displayProductAdminTable(data);
+                } else {
+                    console.error("Failed to fetch seller data:", response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error("Error fetching seller data:", error);
+            }
+        }
+
+        function displayProductAdminTable(users) {
+            console.log(users);
+
+            const userTableBody = document.getElementById('admintable');
+            userTableBody.style.display = "block";
+            userTableBody.innerHTML = "";
+            userTable.style.display = "block";
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+
+
+                // User details
+                row.innerHTML = `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                 
+                    <td>
+                        <button class="del-btn-productadmin" data-product-id="${user.id}">delete</button>
+
+                    </td>
+                </tr>
+
+
+                `;
+
+                userTableBody.appendChild(row);
+                userTableBody.style.display = "block"
+            });
+            document.querySelectorAll('.del-btn-productadmin').forEach(button => {
+                button.addEventListener('click', async function () {
+                    const userId = this.getAttribute('data-product-id');
+                    const token = localStorage.getItem('TOKEN');
+
+                    if (!token) {
+                        console.error("No token found in local storage.");
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/admins?userId=${userId}`, {
+                            method: "DELETE",
+                            headers: {
+                                "Authorization": `Bearer ${token}`, // Add JWT token
+                                "Content-Type": "application/json"
+                            },
+
+                        });
+
+                        if (response.ok) {
+                            console.log("User deleted successfully.");
+                            alert("User deleted successfully!");
+
+                            // Optionally, refresh the user list to reflect the deletion
+                            fetchUser();
+                        } else {
+                            console.error("Failed to delete user:", response.status, response.statusText);
+                            alert("Failed to delete user.");
+                        }
+                    } catch (error) {
+                        console.error("Error deleting user:", error);
+                    }
+                });
+            });
+        }
+        function fetchUserAdmin() {
+            document.querySelector(".container").style.display = "none";
+            document.querySelector("#userTable").style.display = "none";
+            document.getElementById('adminTable').style.display = "block";
+            document.getElementById('registerForm').style.display = "none";
+            document.querySelector(".div-user-container").style.display = "none";
+            // Get the JWT token from localStorage
+            const token = localStorage.getItem('TOKEN');
+
+            if (!token) {
+                console.error("No token found in local storage.");
+                return;
+            }
+
+            // Make the GET request to fetch seller products
+            fetch(`http://localhost:8080/admin/${currentRole}/dashboard/useradmins`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                credentials: "include"
+            })
+                .then(response => response.json())
+                .then(data => {
+
+
+                    // Display the products in the container
+                    displayUserAdminTable(data);
+                })
+                .catch(error => {
+                    console.error("Error fetching products:", error);
+                });
+        }
+
+        function displayUserAdminTable(users) {
+            document.getElementById('userTable').style.display = "none";;
+
+            const userTableBody = document.getElementById('admintable');
+            userTableBody.innerHTML = "";
+            userTable.style.display = "block";
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+            
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                 
+                    <td>
+                        <button class="del-btn-useradmin" data-product-id="${user.id}">delete</button>
+                        
+                    </td>
+             
+
+
+                `;
+
+                userTableBody.appendChild(row);
+                userTableBody.style.display = "block"
+            });
+            document.querySelectorAll('.del-btn-useradmin').forEach(button => {
+                button.addEventListener('click', async function () {
+                    const userId = this.getAttribute('data-product-id');
+                    const token = localStorage.getItem('TOKEN');
+
+                    if (!token) {
+                        console.error("No token found in local storage.");
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/admins?userId=${userId}`, {
+                            method: "DELETE",
+                            headers: {
+                                "Authorization": `Bearer ${token}`, // Add JWT token
+                                "Content-Type": "application/json"
+                            },
+
+                        });
+
+                        if (response.ok) {
+                            console.log("User deleted successfully.");
+                            alert("User deleted successfully!");
+
+                            // Optionally, refresh the user list to reflect the deletion
+                            fetchUser();
+                        } else {
+                            console.error("Failed to delete user:", response.status, response.statusText);
+                            alert("Failed to delete user.");
+                        }
+                    } catch (error) {
+                        console.error("Error deleting user:", error);
+                    }
+                });
+            });
+        }
+        // button.addEventListener('click', async function () {
+        //     const userId = this.getAttribute('data-product-id');
+        //     const token = localStorage.getItem('TOKEN'); // Get the JWT token
+
+        //     if (!token) {
+        //         console.error("No token found in local storage.");
+        //         return;
+        //     }
+
+        //     try {
+        //         // Send the DELETE request to the specified endpoint
+        //         const response = await fetch(`http://localhost:8080/admin/${currentRole}/dashboard/user?userId=${userId}`, {
+        //             method: "DELETE",
+        //             headers: {
+        //                 "Authorization": `Bearer ${token}`, // Add JWT token
+        //                 "Content-Type": "application/json"
+        //             },
+
+        //         });
+
+        //         if (response.ok) {
+        //             console.log("User deleted successfully.");
+        //             alert("User deleted successfully!");
+
+        //             // Optionally, refresh the user list to reflect the deletion
+        //             fetchUser();
+        //         } else {
+        //             console.error("Failed to delete user:", response.status, response.statusText);
+        //             alert("Failed to delete user.");
+        //         }
+        //     } catch (error) {
+        //         console.error("Error deleting user:", error);
+        //     }
+        // });
+
+
+        fetchDashboardData();
+
+    </script>
+
+</body>
+
+</html>
