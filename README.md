@@ -24,6 +24,13 @@ This is a simple frontend for the e-commerce project developed using HTML, inlin
 
 ---
 
+## Backend
+- The Backend for this project is available on GitHub.
+
+  [Backend Repository](https://github.com/Rituraj2610/Ecommerce-Spring-Boot)
+
+---
+
 ## **Frontend Files and Instructions**
 
 ### Admin Login
