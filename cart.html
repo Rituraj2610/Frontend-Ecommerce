@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link rel="stylesheet" href="User.css">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div>
+            <a href="product.html">Home</a>
+            <a href="cart.html">Cart</a>
+            <a href="order.html">Order</a>
+            <a href="./seller-dashboard/index.html">join us</a>
+
+        </div>
+
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="cart-container">
+        <h2>Your Cart</h2>
+        <div id="cartItemsContainer">
+
+        </div>
+        <p id="totalAmount">Total Amount: $0.00</p>
+        <button onclick="placeOrder()" class="placeOrder">Place Order</button>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.setItem('JWT_TOKEN', null);
+            window.location.href = 'index.html';
+        }
+
+        async function fetchCart() {
+            const token = localStorage.getItem('JWT_TOKEN');
+
+            try {
+                const response = await fetch("http://localhost:8080/api/v1/buyer/cart", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include"
+                });
+
+                if (response.ok) {
+                    const cartData = await response.json();
+                    cartData.cartItem.forEach(item => {
+                        item.basePrice = item.price / item.quantity;
+                    });
+                    displayCart(cartData);
+                } else {
+                    console.error("Failed to fetch cart data:", response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error("Error fetching cart data:", error);
+            }
+        }
+
+        function displayCart(cartData) {
+            const cartContainer = document.getElementById('cartItemsContainer');
+            cartContainer.innerHTML = ""
+
+            cartData.cartItem.forEach(item => {
+                const cartItemDiv = document.createElement('div');
+                cartItemDiv.classList.add('cart-item');
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = item.selectedForPayment;
+                checkbox.onchange = () => {
+                    item.selectedForPayment = checkbox.checked;
+                    updateTotalAmount(cartData.cartItem);
+                };
+                cartItemDiv.appendChild(checkbox);
+
+                const img = document.createElement('img');
+                img.src = item.image;
+                img.alt = item.name;
+                cartItemDiv.appendChild(img);
+
+                const cartDetailsDiv = document.createElement('div');
+                cartDetailsDiv.classList.add('cart-details');
+                cartDetailsDiv.innerHTML = `
+                    <p><strong>${item.name}</strong></p>
+                    <p>Price: $${item.price.toFixed(2)}</p>
+                `;
+                cartItemDiv.appendChild(cartDetailsDiv);
+
+                const quantityControlsDiv = document.createElement('div');
+                quantityControlsDiv.classList.add('quantity-controls');
+                const minusButton = document.createElement('button');
+                minusButton.textContent = "-";
+                minusButton.onclick = () => {
+                    if (item.quantity > 1) {
+                        item.quantity--;
+                        item.price = item.quantity * item.basePrice;
+                        quantityDisplay.textContent = item.quantity;
+                        updateTotalAmount(cartData.cartItem);
+                    }
+                };
+
+                const quantityDisplay = document.createElement('span');
+                quantityDisplay.textContent = item.quantity;
+
+                const plusButton = document.createElement('button');
+                plusButton.textContent = "+";
+                plusButton.onclick = () => {
+                    item.quantity++;
+                    item.price = item.quantity * item.basePrice;
+                    quantityDisplay.textContent = item.quantity;
+                    updateTotalAmount(cartData.cartItem);
+                };
+
+                quantityControlsDiv.appendChild(minusButton);
+                quantityControlsDiv.appendChild(quantityDisplay);
+                quantityControlsDiv.appendChild(plusButton);
+                cartDetailsDiv.appendChild(quantityControlsDiv);
+
+                // Save button
+                const saveButton = document.createElement('button');
+                saveButton.classList = 'saveButton';
+                saveButton.textContent = "Save";
+                saveButton.onclick = () => {
+                    updateCartItem(item);
+                };
+                const deleteButton = document.createElement('button');
+                deleteButton.classList = 'deleteButton';
+                deleteButton.textContent = "remove";
+                deleteButton.onclick = () => {
+                    deleteCartItem(item);
+                };
+                cartDetailsDiv.appendChild(saveButton);
+                cartDetailsDiv.appendChild(deleteButton);
+
+                cartContainer.appendChild(cartItemDiv);
+            });
+
+            // Update total amount
+            updateTotalAmount(cartData.cartItem);
+        }
+
+        function updateTotalAmount(cartItems) {
+            const totalAmount = cartItems
+                .filter(item => item.selectedForPayment)
+                .reduce((total, item) => total + item.price, 0);
+            document.getElementById('totalAmount').textContent = `Total Amount: $${totalAmount.toFixed(2)}`;
+        }
+
+        async function updateCartItem(item) {
+            const token = localStorage.getItem('JWT_TOKEN');
+            const cartItemUpdateRequestDTO = {
+                selectedForPayment: item.selectedForPayment,
+                productId: item.productId,
+                price: item.price,
+                quantity: item.quantity
+            };
+
+            try {
+                const response = await fetch("http://localhost:8080/api/v1/buyer/cart", {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(cartItemUpdateRequestDTO),
+                    credentials: "include"
+                });
+
+                if (response.ok) {
+                    console.log("Cart item updated successfully.");
+                    // Refresh cart after successful update
+                    fetchCart();
+                } else {
+                    console.error("Failed to update cart item:", response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error("Error updating cart item:", error);
+            }
+        }
+        function deleteCartItem(item) {
+            // Retrieve the token from localStorage
+            const token = localStorage.getItem('JWT_TOKEN');
+
+            // Verify if the token exists
+            if (!token) {
+                console.error('No JWT token found in localStorage');
+                return;
+            }
+
+            // Construct the URL with cartItemId as a URL-encoded query parameter
+            const url = `http://localhost:8080/api/v1/buyer/cart?cartItemId=${encodeURIComponent(item.productId)}`;
+
+            // Send DELETE request with the JWT token in the Authorization header
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': `Bearer ${token}`  // Include the token in the Authorization header
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to delete cart item');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    console.log('Item deleted successfully:', data);
+                    // Additional UI update logic here, if needed
+                })
+                .catch(error => {
+                    console.error('Error deleting item:', error);
+                });
+            fetchCart();
+        }
+        function placeOrder(orderData) {
+            // Retrieve the JWT token from localStorage
+            const token = localStorage.getItem('JWT_TOKEN');
+
+            // Verify if the token exists
+            if (!token) {
+                console.error('No JWT token found in localStorage');
+                return;
+            }
+
+            // Define the URL for placing an order
+            const url = 'http://localhost:8080/api/v1/buyer/order';
+
+            // Send POST request with the JWT token and order data
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',   // Set content type to JSON
+                    'Authorization': `Bearer ${token}`    // Include the JWT token in the Authorization header
+                },
+                body: JSON.stringify(orderData)          // Convert the order data to a JSON string
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to place order');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Order placed successfully:', data);
+                    alert("order placed successfully");
+                    // Additional logic, like updating the UI, can be added here
+                })
+                .catch(error => {
+                    console.error('Error placing order:', error);
+                });
+                fetchCart();
+        }
+
+
+
+        // Fetch cart data on page load
+        fetchCart();
+    </script>
+
+</body>
+
+</html>

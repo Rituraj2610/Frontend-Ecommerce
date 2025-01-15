@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="User.css">
+</head>
+
+<body>
+    <div class="navbar">
+        <div>
+            <a href="product.html">Home</a>
+            <a href="cart.html">Cart</a>
+            <a href="order.html">Order</a>
+            <a href="./seller-dashboard/index.html">join us</a>
+
+        </div>
+
+        <button onclick="logout()" id="logout-btn">Logout</button>
+        <a href="index.html" id="login-btn" style="display: none;"><button>Login</button></a>
+    </div>
+    <div class="products-container">
+        <div>
+        <div class="searchbox">
+            <input type="text" id="search" placeholder="Search for products...">
+
+            <select class="form-control" id="category" name="category" required>
+                <option value="" disabled selected>Select a category</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Books">Books</option>
+                <option value="Home Decor">Home Decor</option>
+                <option value="Jewelry & Accessories">Jewelry & Accessories</option>
+                <option value="Art & Collectibles">Art & Collectibles</option>
+                <option value="Toys & Games">Toys & Games</option>
+                <option value="Craft Supplies & Tools">Craft Supplies & Tools</option>
+                <option value="Health & Beauty">Health & Beauty</option>
+                <option value="Vintage">Vintage</option>
+                <option value="Music">Music</option>
+                <option value="Stationery">Stationery</option>
+                <option value="Pet Supplies">Pet Supplies</option>
+                <option value="Wedding & Party">Wedding & Party</option>
+                <option value="Sports & Outdoors">Sports & Outdoors</option>
+                <option value="Baby & Toddler">Baby & Toddler</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Garden & Outdoor">Garden & Outdoor</option>
+                <option value="Food & Drink">Food & Drink</option>
+            </select>
+            <button onclick="filterElement()">Apply</button>
+           <input type="number" name="min-num" id="min-num" placeholder="min-num">
+           <input type="number" name="max-num" id="max-num" placeholder="max-num">
+           <button onclick="filterprice()">filter by price</button>
+
+        </div>
+
+
+        <div class="container">
+
+
+        </div>
+    </div>
+        <div class="reviews-modal" id="reviewsModal">
+            <div class="modal-content">
+                <span class="close-button" onclick="closeModal()">&times;</span>
+                <h2>Product Reviews</h2>
+                <div class="reviews-container">
+                    <!-- Reviews will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        function logout() {
+            localStorage.setItem('JWT_TOKEN', null);
+            window.location.href = 'product.html';
+        }
+        function filterprice() {
+            const min = document.getElementById("min-num").value || 1;
+            const max = document.getElementById("max-num").value || 9999;
+
+            // Construct the URL with query parameters
+            const url = `http://localhost:8080/api/v1/buyer/filter?minPrice=${min}&maxPrice=${max}`;
+
+            // Retrieve JWT token from local storage (or another secure location)
+            const token = localStorage.getItem("JWT_TOKEN"); // Ensure you have stored the JWT token here
+
+            // Send GET request with JWT in the Authorization header
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Send JWT token
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data); // Handle the data from the server
+                    // You could use this data to update the UI or handle products as needed
+                    displayProducts(data.productList);
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+        function filterElement() {
+            const name = document.getElementById("search").value || null;
+            const category = document.getElementById("category").value || null;
+
+            // Get JWT token from local storage
+            const token = localStorage.getItem("JWT_TOKEN");
+
+            // Construct the query parameters
+            const url = new URL("http://localhost:8080/api/v1/buyer/search");
+            url.searchParams.append("name", name);
+            url.searchParams.append("category", category);
+
+            // Set up the fetch options
+            const options = {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            };
+
+            // Send the GET request
+            fetch(url, options)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok " + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Data:", data);
+                    displayProducts(data.productList);
+
+                    // Handle the data received
+                })
+                .catch(error => {
+                    console.error("There was a problem with the fetch operation:", error);
+                });
+        }
+
+        async function load() {
+            if (!localStorage.getItem('JWT_TOKEN') || localStorage.getItem('JWT_TOKEN') === 'null') {
+                document.getElementById('logout-btn').style.display = "none";
+                document.getElementById('login-btn').style.display = "block";
+
+                try {
+
+
+                    const response = await fetch('http://localhost:8080/dashboard', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const products = await response.json();
+                    displayProducts(products);
+                } catch (error) {
+                    console.error("Failed to fetch products:", error);
+                }
+
+
+
+            } else {
+                document.getElementById('logout-btn').style.display = "block";
+                document.getElementById('login-btn').style.display = "none";
+                fetchProducts();
+
+            }
+
+        }
+
+
+        async function fetchProducts() {
+            try {
+                // Retrieve the JWT token from local storage
+                const token = localStorage.getItem('JWT_TOKEN');
+
+                if (!token) {
+                    throw new Error("JWT token not found in local storage");
+                }
+
+                const response = await fetch('http://localhost:8080/api/v1/buyer/dashboard/products', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // Add the JWT token to the Authorization header
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const products = await response.json();
+                displayProducts(products);
+            } catch (error) {
+                console.error("Failed to fetch products:", error);
+            }
+        }
+        function displayProducts(products) {
+            const container = document.querySelector('.container');
+            container.innerHTML = ''; // Clear existing content
+
+            products.forEach(product => {
+                // Generate product card HTML
+                const cardHTML = `
+                    <div class="card">
+                        <div class="image-carousel">
+                            <div class="carousel-images">
+                                ${product.imageUrls.map((url, index) =>
+                    `<img src="${url}" alt="Product image ${index + 1}" class="product-image" data-index="${index}">`
+                ).join('')}
+                            </div>
+                            <button class="carousel-button left">&lt;</button>
+                            <button class="carousel-button right">&gt;</button>
+                        </div>
+                        <div class="card-content">
+                            <h2>${product.name}</h2>
+                               <p>${product.category}</p>
+                            <p class="price">$${product.price.toFixed(2)}</p>
+                            <p>${product.description}</p>
+
+                            <button class="get-reviews" data-product-id="${product.id}">Reviews</button>
+
+                            <button class="add-to-cart" data-product-id="${product.id}">Add to Cart</button>
+                        </div>
+                    </div>
+        `;
+
+                container.innerHTML += cardHTML;
+            });
+
+
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function () {
+                    const productId = this.getAttribute('data-product-id');
+                    const product = products.find(p => p.id == productId);
+
+                    const payload = {
+                        productId: product.id,
+                        price: product.price,
+                        quantity: 1,
+                        name: product.name,
+                        image: product.imageUrls[0]
+                    };
+
+                    addToCart(payload); // Call your addToCart function
+                });
+            });
+            // Add event listeners for "Add to Cart" buttons after HTML is rendered
+            document.querySelectorAll('.get-reviews').forEach(button => {
+                button.addEventListener('click', function () {
+                    const productId = this.getAttribute('data-product-id');
+                    const product = products.find(p => p.id == productId);
+
+
+
+                    fetchReviews(product.id); // Call your addToCart function
+                });
+            });
+
+
+
+            // Optionally, handle carousel buttons for each card
+            const leftButtons = container.querySelectorAll('.carousel-button.left');
+            const rightButtons = container.querySelectorAll('.carousel-button.right');
+            const carouselImages = container.querySelectorAll('.carousel-images');
+
+            leftButtons.forEach((button, index) => {
+                let currentImageIndex = 0;
+                button.addEventListener('click', () => {
+                    const images = carouselImages[index].querySelectorAll('.product-image');
+                    currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+                    images.forEach(img => img.style.display = 'none'); // Hide all images
+                    images[currentImageIndex].style.display = 'block'; // Show the current image
+                });
+            });
+
+            rightButtons.forEach((button, index) => {
+                let currentImageIndex = 0;
+                button.addEventListener('click', () => {
+                    const images = carouselImages[index].querySelectorAll('.product-image');
+                    currentImageIndex = (currentImageIndex + 1) % images.length;
+                    images.forEach(img => img.style.display = 'none'); // Hide all images
+                    images[currentImageIndex].style.display = 'block'; // Show the current image
+                });
+            });
+
+            // Initialize the carousel for each product
+            const allCarousels = container.querySelectorAll('.carousel-images');
+            allCarousels.forEach((carousel, index) => {
+                const images = carousel.querySelectorAll('.product-image');
+                images.forEach((img, i) => {
+                    if (i !== 0) img.style.display = 'none'; // Hide all images except the first one
+                });
+            });
+        }
+        async function fetchReviews(id) {
+            // Retrieve the JWT token from local storage
+            const jwtToken = localStorage.getItem("JWT_TOKEN");
+
+            if (!jwtToken) {
+                alert("Authentication token not found. Please log in.");
+                return;
+            }
+
+            // Construct the URL with the product ID as a query parameter
+            const url = `http://localhost:8080/api/v1/buyer/product/review?productId=${id}`;
+
+            try {
+                // Send the GET request with authorization header
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${jwtToken}`,  // Include JWT token in Authorization header
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                // Check for a successful response
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+
+                // Parse the JSON response
+                const reviews = await response.json();
+                displayReviews(reviews);
+                // console.log("Fetched reviews:", reviews);
+                return reviews;  // Return or handle reviews data as needed
+            } catch (error) {
+                console.error("Failed to fetch reviews:", error);
+                alert("Unable to fetch reviews. Please try again.");
+            }
+        }
+        function displayReviews(reviews) {
+            // Show the modal by setting display to block
+            document.querySelector('.reviews-modal').style.display = "flex";
+
+            // Get the reviews container element
+            const reviewsContainer = document.querySelector('.reviews-container');
+
+            // Clear any existing content in the container
+            reviewsContainer.innerHTML = '';
+
+            // Loop through each review and create HTML for each one
+            reviews.forEach(review => {
+                // Create a container for each review
+                const reviewDiv = document.createElement('div');
+                reviewDiv.classList.add('review');
+
+                // Create HTML for rating and comment
+                reviewDiv.innerHTML = `
+            <p><strong>Rating:</strong> ${review.rating}/5</p>
+            <p><strong>Comment:</strong> ${review.comment}</p>
+            <hr>
+        `;
+
+                // Append each review to the reviews container
+                reviewsContainer.appendChild(reviewDiv);
+            });
+        }
+
+
+        async function addToCart(payload) {
+            try {
+                const token = localStorage.getItem('JWT_TOKEN');
+
+                if (!token) {
+                    throw new Error("JWT token not found in local storage");
+                }
+
+                const response = await fetch('http://localhost:8080/api/v1/buyer/cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // Add JWT token to the Authorization header
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to add to cart: ${response.status}`);
+                }
+
+                const responseData = await response.text();
+                console.log('Product added to cart successfully', responseData);
+            } catch (error) {
+                console.error('Error adding product to cart:', error);
+            }
+        }
+        function closeModal() {
+            document.querySelector('.reviews-modal').style.display = "none";
+
+        }
+
+
+
+
+
+        load();
+
+
+    </script>
+</body>
+
+</html>

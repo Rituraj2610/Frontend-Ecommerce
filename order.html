@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="User.css">
+</head>
+
+<body>
+    <div class="navbar">
+        <div>
+            <a href="product.html">Home</a>
+            <a href="cart.html">Cart</a>
+            <a href="order.html">Order</a>
+            <a href="./seller-dashboard/index.html">join us</a>
+        </div>
+
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div id="orders-container"></div> <!-- Container for displaying orders -->
+
+    <script>
+        function logout() {
+            localStorage.setItem('JWT_TOKEN', null);
+            window.location.href = 'index.html';
+        }
+
+        function getAllOrders() {
+            // Retrieve the JWT token from localStorage
+            const token = localStorage.getItem('JWT_TOKEN');
+
+            // Verify if the token exists
+            if (!token) {
+                console.error('No JWT token found in localStorage');
+                return;
+            }
+
+            // Define the URL for fetching all orders
+            const url = 'http://localhost:8080/api/v1/buyer/orders';
+
+            // Send GET request with the JWT token in the Authorization header
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`  // Include the token in the Authorization header
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch orders');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayOrders(data); // Call displayOrders to render the data
+                })
+                .catch(error => {
+                    console.error('Error fetching orders:', error);
+                });
+        }
+
+        // Function to display the orders
+        function displayOrders(data) {
+            const ordersContainer = document.getElementById('orders-container');
+            const orders = data.orderList;
+
+            // Clear any previous content
+            ordersContainer.innerHTML = '';
+
+            // Loop through the orders and create HTML for each one
+            orders.forEach(order => {
+                const orderElement = document.createElement('div');
+                orderElement.classList.add('order');
+
+                // Build the order details
+                const orderHTML = `
+                    <div class="order-header">
+                        <h3>Order ID: ${order.orderId}</h3>
+                        <p>Status: ${order.status}</p>
+                        <p>Order Date: ${new Date(order.orderDateTime).toLocaleString()}</p>
+                    </div>
+                    <div class="order-items">
+                        <img src="${order.cartItem.image}" alt="${order.cartItem.name}" class="order-item-image">
+                        <div class="order-item-details">
+                            <h4>${order.cartItem.name}</h4>
+                            <p>Quantity: ${order.cartItem.quantity}</p>
+                            <p>Price: $${order.cartItem.price}</p>
+                        </div>
+                    </div>
+                    <div class="order-summary">
+                        <p>Total Price: $${order.totalPrice}</p>
+                        <p>Quantity: ${order.quantity}</p>
+                    </div>
+                `;
+
+                // Set the inner HTML of the order element
+                orderElement.innerHTML = orderHTML;
+                if (order.status === 'pending') {
+                    const button = document.createElement('button');
+                    button.classList = "deleteButton";
+                    button.textContent = "Delete Order";
+                    orderElement.appendChild(button);
+                    button.onclick = () => {
+                        // Retrieve the JWT token from local storage
+                        const jwtToken = localStorage.getItem("JWT_TOKEN");
+
+                        const orderId = order.orderId;  
+
+                        const url = `http://localhost:8080/api/v1/buyer/order?orderId=${orderId}`;
+
+                        fetch(url, {
+                            method: "DELETE",
+                            headers: {
+                                "Authorization": `Bearer ${jwtToken}`, 
+                                "Content-Type": "application/json"
+                            }
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`Error: ${response.statusText}`);
+                                }
+                                getAllOrders();
+                                return response.json(); 
+                            })
+                            .then(data => {
+                                console.log("Order deleted successfully:", data);
+                            })
+                            .catch(error => {
+                                console.error("Failed to delete order:", error);
+                            });
+
+                    }
+                    
+                }
+
+                if (order.status === 'delivered') {
+                    // Create a div for the review form
+                    const reviewDiv = document.createElement('div');
+                    reviewDiv.innerHTML = `
+                <div class="review-container">
+                    <h2>Write a Review</h2>
+                    <form id="review-form-${order.id}">
+                        <!-- Rating Field -->
+                        <div class="form-group">
+                            <label for="rating">Rating:</label>
+                            <select id="rating-${order.id}" name="rating" required>
+                                <option value="" disabled selected>Select your rating</option>
+                                <option value="1">1 - Poor</option>
+                                <option value="2">2 - Fair</option>
+                                <option value="3">3 - Good</option>
+                                <option value="4">4 - Very Good</option>
+                                <option value="5">5 - Excellent</option>
+                            </select>
+                        </div>
+
+                        <!-- Comment Field -->
+                        <div class="form-group">
+                            <label for="comment">Comment:</label>
+                            <textarea id="comment-${order.id}" name="comment" rows="4" placeholder="Write your review here..." required></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit">Submit Review</button>
+                    </form>
+                </div>
+            `;
+
+                    // Initially hide the review form div
+                    reviewDiv.style.display = "none";
+
+                    // Create the "Write a Review" button
+                    const toggleButton = document.createElement('button');
+                    toggleButton.classList.add('btn');
+                    toggleButton.textContent = 'Write a Review';
+
+                    // Toggle the display of the review form when the button is clicked
+                    toggleButton.onclick = () => {
+                        reviewDiv.style.display = reviewDiv.style.display === "none" ? "block" : "none";
+                    };
+
+                    // Append the button and review form to the order element
+                    orderElement.appendChild(toggleButton);
+                    orderElement.appendChild(reviewDiv);
+
+                    // Add event listener for the review form submission after it is appended
+                    const reviewForm = reviewDiv.querySelector(`#review-form-${order.id}`);
+                    reviewForm.addEventListener('submit', function (event) {
+                        event.preventDefault();
+
+                        // Retrieve rating and comment
+                        const rating = document.getElementById(`rating-${order.id}`).value;
+                        const comment = document.getElementById(`comment-${order.id}`).value;
+
+                        // Get the JWT token from localStorage
+                        const token = localStorage.getItem('JWT_TOKEN');
+
+                        // Ensure the token exists
+                        if (!token) {
+                            alert('You must be logged in to submit a review.');
+                            return;
+                        }
+
+                        // Construct the payload
+                        const payload = {
+                            productId: order.cartItem.productId,
+                            rating: parseInt(rating),
+                            comment: comment
+                        };
+
+                        // Send the POST request to submit the review
+                        fetch('http://localhost:8080/api/v1/buyer/product/review', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,  // Include JWT token
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)  // Send the review data as JSON
+                        })
+                            .then(response => response.text())
+                            .then(data => {
+                                if (data.success) {
+                                    alert('Your review has been submitted!');
+                                    reviewDiv.style.display = "none"; // Hide the form after submission
+                                } else {
+                                    alert('Error submitting your review.');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while submitting your review.');
+                            });
+                    });
+                }
+
+                // Append the order element to the container
+                ordersContainer.appendChild(orderElement);
+            });
+        }
+
+
+
+        // Call the function to get orders when the page loads
+        getAllOrders();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Base styles */
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf3 100%);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header styles */
+header {
+    background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+    padding: 15px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: transparent !important;
+    box-shadow: none;
+}
+
+.navbar .navbar-nav .nav-link {
+    color: white !important;
+    position: relative;
+    padding: 8px 15px;
+    transition: all 0.3s ease;
+}
+
+.navbar .navbar-nav .nav-link:hover {
+    color: #ffd700 !important;
+    transform: translateY(-2px);
+}
+
+.navbar .navbar-brand {
+    color: #ffd700 !important;
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Form container styles */
+.container {
+    margin-top: 30px;
+    max-width: 1200px;
+}
+
+.form-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Form elements */
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border: 2px solid #e8ecf3;
+    border-radius: 8px;
+    padding: 0.75rem;
+    transition: all 0.2s ease-in-out;
+    background: #f8f9fa;
+}
+
+.form-control:focus {
+    border-color: #4b6cb7;
+    box-shadow: 0 0 0 0.2rem rgba(75, 108, 183, 0.25);
+    background: white;
+}
+
+/* Page title */
+.page-title {
+    color: #2c3e50;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+    text-align: center;
+}
+
+.page-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+    border-radius: 2px;
+}
+
+/* Button styles */
+.btn-primary {
+    background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+    border: none;
+    padding: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(75, 108, 183, 0.3);
+}
+
+.btn-secondary {
+    background-color: #5a6774;
+    border: none;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(90, 103, 116, 0.3);
+}
+
+/* Image upload area */
+.image-input-container {
+    border: 2px dashed #e8ecf3;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+    background: #f8f9fa;
+}
+
+.image-input-container:hover {
+    border-color: #4b6cb7;
+    background-color: #f5f7fa;
+}
+
+/* Warning and helper text */
+.form-text {
+    color: #e74c3c;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.delete-warning {
+    color: #e74c3c;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.text-muted {
+    color: #5a6774 !important;
+}
+
+/* Footer styles */
+footer {
+    background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    margin-top: auto;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .form-container {
+        padding: 1.5rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">Seller Dashboard</a>
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link btn btn-outline-light" href="dashboard.html">Home</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="form-container">
+            <h2 class="page-title text-center">Edit Product Details</h2>
+            
+            <form id="edit-product-form" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Product Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+            
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price ($)</label>
+                    <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+                </div>
+            
+                <!-- Category Dropdown -->
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-control" id="category" name="category" required>
+                        <option value="" disabled selected>Select a category</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Books">Books</option>
+                        <option value="Home & Kitchen">Home & Kitchen</option>
+                        <option value="Jewelry & Accessories">Jewelry & Accessories</option>
+                        <option value="Art & Collectibles">Art & Collectibles</option>
+                        <option value="Toys & Games">Toys & Games</option>
+                        <option value="Craft Supplies & Tools">Craft Supplies & Tools</option>
+                        <option value="Health & Beauty">Health & Beauty</option>
+                        <option value="Vintage">Vintage</option>
+                        <option value="Music">Music</option>
+                        <option value="Stationery">Stationery</option>
+                        <option value="Pet Supplies">Pet Supplies</option>
+                        <option value="Wedding & Party">Wedding & Party</option>
+                        <option value="Sports & Outdoors">Sports & Outdoors</option>
+                        <option value="Baby & Toddler">Baby & Toddler</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Garden & Outdoor">Garden & Outdoor</option>
+                        <option value="Food & Drink">Food & Drink</option>
+                        <!-- Add more categories as needed -->
+                    </select>
+                    
+                </div>
+            
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                </div>
+            
+                <div class="mb-3">
+                    <label for="stock" class="form-label">Stock</label>
+                    <input type="number" class="form-control" id="stock" name="stock" required>
+                </div>
+            
+                <div class="mb-3">
+                    <label for="imageUrls" class="form-label">Images to Delete</label>
+                    <input type="text" class="form-control" id="imageUrls" name="imageUrls">
+                    <small class="form-text delete-warning">Keep the images you want to delete</small>
+                </div>
+            
+                <div class="mb-4">
+                    <label for="images" class="form-label">Upload New Images</label>
+                    <input type="file" class="form-control" id="images" name="images" multiple accept="image/*">
+                    <small class="text-muted">Drop your images here or click to browse</small>
+                </div>
+            
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">Update Product</button>
+                    <a href="dashboard.html" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="mb-0">&copy; 2024 Seller Dashboard. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/edit.js"></script>
+</body>
+</html>
