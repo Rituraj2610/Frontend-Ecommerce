@@ -82,7 +82,7 @@
             const max = document.getElementById("max-num").value || 9999;
 
             // Construct the URL with query parameters
-            const url = `http://localhost:8080/api/v1/buyer/filter?minPrice=${min}&maxPrice=${max}`;
+            const url = `https://44.218.129.201/api/v1/buyer/filter?minPrice=${min}&maxPrice=${max}`;
 
             // Retrieve JWT token from local storage (or another secure location)
             const token = localStorage.getItem("JWT_TOKEN"); // Ensure you have stored the JWT token here
@@ -118,7 +118,7 @@
             const token = localStorage.getItem("JWT_TOKEN");
 
             // Construct the query parameters
-            const url = new URL("http://localhost:8080/api/v1/buyer/search");
+            const url = new URL("https://44.218.129.201/api/v1/buyer/search");
             url.searchParams.append("name", name);
             url.searchParams.append("category", category);
 
@@ -158,7 +158,7 @@
                 try {
 
 
-                    const response = await fetch('http://localhost:8080/dashboard', {
+                    const response = await fetch('https://44.218.129.201/dashboard', {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -197,7 +197,7 @@
                     throw new Error("JWT token not found in local storage");
                 }
 
-                const response = await fetch('http://localhost:8080/api/v1/buyer/dashboard/products', {
+                const response = await fetch('https://44.218.129.201/api/v1/buyer/dashboard/products', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -323,7 +323,7 @@
             }
 
             // Construct the URL with the product ID as a query parameter
-            const url = `http://localhost:8080/api/v1/buyer/product/review?productId=${id}`;
+            const url = `https://44.218.129.201/api/v1/buyer/product/review?productId=${id}`;
 
             try {
                 // Send the GET request with authorization header
@@ -387,7 +387,7 @@
                     throw new Error("JWT token not found in local storage");
                 }
 
-                const response = await fetch('http://localhost:8080/api/v1/buyer/cart', {
+                const response = await fetch('https://44.218.129.201/api/v1/buyer/cart', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
