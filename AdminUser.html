@@ -348,7 +348,7 @@
             const token = localStorage.getItem('TOKEN');
 
             try {
-                const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/admins`, {
+                const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/admins`, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${token}`,  // Add the JWT token in the Authorization header
@@ -387,7 +387,7 @@
             const token = localStorage.getItem('TOKEN');
 
             try {
-                const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard`, {
+                const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -418,7 +418,7 @@
             const token = localStorage.getItem('TOKEN');
 
             try {
-                const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/sellers`, {
+                const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/sellers`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -486,7 +486,7 @@
             const token = localStorage.getItem("TOKEN");
 
             // Set up the URL and request options
-            const url = `https://44.218.129.201/admin/${currentRole}/dashboard/delete-seller?userId=${id}`;
+            const url = `http://44.218.129.201/admin/${currentRole}/dashboard/delete-seller?userId=${id}`;
 
 
             const options = {
@@ -528,7 +528,7 @@
             }
 
             // Make the GET request to fetch seller products
-            fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/seller-products?sellerId=${sellerId}`, {
+            fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/seller-products?sellerId=${sellerId}`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -608,7 +608,7 @@
 
                     try {
                         // Send the DELETE request to the specified endpoint
-                        const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/delete-product?productId=${productId}`, {
+                        const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/delete-product?productId=${productId}`, {
                             method: "DELETE",
                             headers: {
                                 "Authorization": `Bearer ${token}`, // Add JWT token
@@ -645,7 +645,7 @@
 
         //     // Make the DELETE request to remove the product
         //     try {
-        //         const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/delete-product?productId=${productId}`, {
+        //         const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/delete-product?productId=${productId}`, {
         //             method: "DELETE",
         //             headers: {
         //                 "Authorization": `Bearer ${token}`,
@@ -672,7 +672,7 @@
             const token = localStorage.getItem('TOKEN');
 
             try {
-                const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/users`, {
+                const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/users`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -777,7 +777,7 @@
 
                     try {
                         // Send the DELETE request to the specified endpoint
-                        const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/user?userId=${userId}`, {
+                        const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/user?userId=${userId}`, {
                             method: "DELETE",
                             headers: {
                                 "Authorization": `Bearer ${token}`, // Add JWT token
@@ -815,7 +815,7 @@
 
                     try {
                         // Send the request with GET method and buyerId as query parameter
-                        const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/user-cart?buyerId=${encodeURIComponent(userId)}`, {
+                        const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/user-cart?buyerId=${encodeURIComponent(userId)}`, {
                             method: "GET",  // Using GET method
                             headers: {
                                 "Authorization": `Bearer ${token}`,  // Include JWT token in Authorization header
@@ -850,7 +850,7 @@
 
                     try {
                         // Send the request with GET method and buyerId as query parameter
-                        const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/user-reviews?userId=${userId}`, {
+                        const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/user-reviews?userId=${userId}`, {
                             method: "GET",  // Using GET method
                             headers: {
                                 "Authorization": `Bearer ${token}`,  // Include JWT token in Authorization header
@@ -943,7 +943,7 @@
             document.querySelector(".div-user-container").style.display = "none";
             const token = localStorage.getItem('TOKEN');
             try {
-                const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/productadmins`, {
+                const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/productadmins`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -1007,7 +1007,7 @@
                     }
 
                     try {
-                        const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/admins?userId=${userId}`, {
+                        const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/admins?userId=${userId}`, {
                             method: "DELETE",
                             headers: {
                                 "Authorization": `Bearer ${token}`, // Add JWT token
@@ -1047,7 +1047,7 @@
             }
 
             // Make the GET request to fetch seller products
-            fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/useradmins`, {
+            fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/useradmins`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -1106,7 +1106,7 @@
                     }
 
                     try {
-                        const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/admins?userId=${userId}`, {
+                        const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/admins?userId=${userId}`, {
                             method: "DELETE",
                             headers: {
                                 "Authorization": `Bearer ${token}`, // Add JWT token
@@ -1142,7 +1142,7 @@
 
         //     try {
         //         // Send the DELETE request to the specified endpoint
-        //         const response = await fetch(`https://44.218.129.201/admin/${currentRole}/dashboard/user?userId=${userId}`, {
+        //         const response = await fetch(`http://44.218.129.201/admin/${currentRole}/dashboard/user?userId=${userId}`, {
         //             method: "DELETE",
         //             headers: {
         //                 "Authorization": `Bearer ${token}`, // Add JWT token

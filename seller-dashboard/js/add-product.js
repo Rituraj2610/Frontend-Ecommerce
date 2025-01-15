@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            const response = await fetch('http://localhost:8080/api/v1/seller/product', {
+            const response = await fetch('http://44.218.129.201/api/v1/seller/product', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`

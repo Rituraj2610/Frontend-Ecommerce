@@ -39,7 +39,7 @@
             }
 
             // Define the URL for fetching all orders
-            const url = 'https://44.218.129.201/api/v1/buyer/orders';
+            const url = 'http://44.218.129.201/api/v1/buyer/orders';
 
             // Send GET request with the JWT token in the Authorization header
             fetch(url, {
@@ -109,7 +109,7 @@
 
                         const orderId = order.orderId;  
 
-                        const url = `https://44.218.129.201/api/v1/buyer/order?orderId=${orderId}`;
+                        const url = `http://44.218.129.201/api/v1/buyer/order?orderId=${orderId}`;
 
                         fetch(url, {
                             method: "DELETE",
@@ -211,7 +211,7 @@
                         };
 
                         // Send the POST request to submit the review
-                        fetch('https://44.218.129.201/api/v1/buyer/product/review', {
+                        fetch('http://44.218.129.201/api/v1/buyer/product/review', {
                             method: 'POST',
                             headers: {
                                 'Authorization': `Bearer ${token}`,  // Include JWT token
