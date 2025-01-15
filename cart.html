@@ -41,7 +41,7 @@
             const token = localStorage.getItem('JWT_TOKEN');
 
             try {
-                const response = await fetch("http://localhost:8080/api/v1/buyer/cart", {
+                const response = await fetch("https://44.218.129.201/api/v1/buyer/cart", {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -164,7 +164,7 @@
             };
 
             try {
-                const response = await fetch("http://localhost:8080/api/v1/buyer/cart", {
+                const response = await fetch("https://44.218.129.201/api/v1/buyer/cart", {
                     method: "PUT",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -196,7 +196,7 @@
             }
 
             // Construct the URL with cartItemId as a URL-encoded query parameter
-            const url = `http://localhost:8080/api/v1/buyer/cart?cartItemId=${encodeURIComponent(item.productId)}`;
+            const url = `https://44.218.129.201/api/v1/buyer/cart?cartItemId=${encodeURIComponent(item.productId)}`;
 
             // Send DELETE request with the JWT token in the Authorization header
             fetch(url, {
@@ -232,7 +232,7 @@
             }
 
             // Define the URL for placing an order
-            const url = 'http://localhost:8080/api/v1/buyer/order';
+            const url = 'https://44.218.129.201/api/v1/buyer/order';
 
             // Send POST request with the JWT token and order data
             fetch(url, {
