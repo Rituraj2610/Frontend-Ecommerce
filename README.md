@@ -37,7 +37,7 @@ This is a simple frontend for the e-commerce project developed using HTML, inlin
 - **adminLogin.html**: Admin login page for signing in to the admin panel.  
 
 ### User Login (Buyer)
-- **loginUser.html**: Login page for buyers to sign in and start shopping.
+- **index.html**: Login page for buyers to sign in and start shopping.
 
 ### Seller Dashboard
 - **seller-dashboard/index.html**: Seller dashboard to manage products, orders, and more.
